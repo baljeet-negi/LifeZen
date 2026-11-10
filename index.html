@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#6856e8">
+<title>LifeZen — Your Productivity Space</title>
+<style>
+:root{
+ --bg:#f5f6fc;--card:#fff;--text:#25243a;--muted:#88889d;
+ --line:#e9e9f1;--purple:#705ce8;--soft:#f0edff;
+ --green:#27ae83;--red:#e56c78;
+}
+body.dark{
+ --bg:#151522;--card:#222235;--text:#f4f2ff;--muted:#aaa8c0;
+ --line:#38384d;--purple:#a99aff;--soft:#35304e;
+ --green:#5bd4aa;--red:#ff8794;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+ width:230px;background:var(--card);border-right:1px solid var(--line);
+ padding:24px 16px;position:fixed;inset:0 auto 0 0;
+ display:flex;flex-direction:column;z-index:5
+}
+.brand{display:flex;align-items:center;gap:11px;padding:0 8px 30px}
+.logo{
+ width:42px;height:42px;border-radius:14px;
+ background:linear-gradient(135deg,#6755e8,#bb7cf0);
+ color:white;display:grid;place-items:center;font-size:23px
+}
+.brand strong{font-size:21px}
+.brand small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+.nav-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);padding:12px 10px}
+.nav button{
+ width:100%;padding:12px;border-radius:10px;background:transparent;
+ color:var(--muted);text-align:left;margin:3px 0;font-weight:600
+}
+.nav button.active,.nav button:hover{background:var(--soft);color:var(--purple)}
+.nav button span{display:inline-block;width:27px}
+.side-note{margin-top:auto;padding:13px;background:var(--soft);border-radius:12px;font-size:12px;color:var(--muted)}
+main{margin-left:230px;width:calc(100% - 230px);padding:27px 30px;max-width:1500px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:25px}
+.top h1{font-size:25px;margin:0}
+.top p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.top-actions{display:flex;gap:9px;align-items:center}
+.btn{padding:10px 14px;border-radius:10px;background:var(--soft);color:var(--purple);font-weight:600}
+.primary{background:linear-gradient(120deg,#6856e8,#9b6dec);color:white}
+.danger{background:#ffe9ec;color:#c94e61}
+.avatar{width:39px;height:39px;border-radius:50%;background:var(--soft);color:var(--purple);display:grid;place-items:center;font-weight:bold}
+.page{display:none}
+.page.active{display:block}
+.welcome{
+ padding:27px;border-radius:18px;color:white;
+ background:linear-gradient(115deg,#5d54dc,#8e68e9 70%,#bc7ce9);
+ margin-bottom:19px;display:flex;justify-content:space-between;align-items:center
+}
+.welcome h2{font-size:23px;margin:0 0 8px}
+.welcome p{margin:0;opacity:.9;font-size:13px}
+.welcome-icon{font-size:45px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:19px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:17px}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-value{font-size:27px;font-weight:750;margin:10px 0 4px}
+.stat-foot{font-size:11px;color:var(--green)}
+.content-grid{display:grid;grid-template-columns:1.3fr .8fr;gap:16px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
+h3{font-size:16px;margin:0}
+.muted{font-size:12px;color:var(--muted)}
+.task-list,.habit-list,.goal-list,.routine-list{display:grid;gap:9px}
+.task,.habit,.goal,.routine-card{
+ display:flex;align-items:center;gap:10px;padding:11px;
+ border:1px solid var(--line);border-radius:10px
+}
+.task input,.habit input,.goal input{accent-color:var(--purple);width:17px;height:17px}
+.task-info{flex:1;min-width:0}
+.task-name{font-size:13px;font-weight:650;overflow-wrap:anywhere}
+.task-meta{font-size:11px;color:var(--muted);margin-top:5px}
+.task.done .task-name{text-decoration:line-through;color:var(--muted)}
+.goal span,.habit span{flex:1;font-size:13px}
+.del,.edit{background:transparent;color:var(--muted);padding:5px;font-size:17px}
+input,select{
+ background:var(--bg);border:1px solid var(--line);border-radius:9px;
+ padding:11px;color:var(--text);min-width:0;width:100%
+}
+.add-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.add-form input:first-child,.add-form button{grid-column:1/-1}
+.goal-row{display:flex;gap:8px;margin-top:12px}
+.goal-row input{flex:1}
+.progress{height:8px;background:var(--line);border-radius:20px;overflow:hidden;margin:12px 0}
+.progress span{height:100%;display:block;background:linear-gradient(90deg,#705ce8,#bc7cf0);width:0;transition:.3s}
+.empty{text-align:center;color:var(--muted);padding:19px;font-size:13px}
+.section-title{font-size:21px;margin:0 0 6px}
+.section-sub{color:var(--muted);font-size:13px;margin:0 0 19px}
+.setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.setting p{margin:5px 0 0}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.day{padding:13px 4px;border:1px solid var(--line);border-radius:9px;text-align:center;font-size:12px;color:var(--muted)}
+.day.today{background:var(--soft);border-color:var(--purple);color:var(--purple);font-weight:bold}
+.mobile-nav{display:none}
+.routine-card{display:block;padding:15px}
+.routine-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.routine-top strong{font-size:15px}
+.routine-actions{display:flex;gap:5px}
+.routine-activity{
+ display:flex;align-items:center;gap:10px;padding:10px 0;
+ border-bottom:1px solid var(--line);font-size:13px
+}
+.routine-activity:last-child{border:0}
+.routine-time{color:var(--purple);font-weight:bold;min-width:65px;font-size:12px}
+.routine-activity span.activity-name{flex:1}
+.routine-activity input[type="checkbox"]{
+ width:18px;height:18px;accent-color:var(--purple);
+ cursor:pointer;flex-shrink:0
+}
+.routine-activity.completed .activity-name{
+ text-decoration:line-through;color:var(--muted)
+}
+.routine-progress{font-size:12px;color:var(--muted);margin-top:12px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid .full{grid-column:1/-1}
+.small-title{font-size:13px;color:var(--muted);margin:15px 0 8px}
+@media(max-width:900px){
+ .sidebar{width:195px}
+ main{margin-left:195px;width:calc(100% - 195px);padding:22px}
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .content-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+ .sidebar{display:none}
+ main{margin:0;width:100%;padding:16px 13px 85px}
+ .top h1{font-size:21px}
+ .welcome{padding:20px}
+ .stats{gap:9px}
+ .card{padding:14px}
+ .mobile-nav{
+  display:flex;position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--line);
+  justify-content:space-around;padding:9px 2px;z-index:8
+ }
+ .mobile-nav button{background:transparent;color:var(--muted);font-size:10px;padding:5px}
+ .mobile-nav button.active{color:var(--purple)}
+ .mobile-nav span{display:block;font-size:19px;margin-bottom:3px}
+ .form-grid{grid-template-columns:1fr}
+ .form-grid .full{grid-column:auto}
+}
+</style>
+<link rel="manifest" href="./manifest.webmanifest">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+ <div class="brand">
+  <div class="logo">✦</div>
+  <div><strong>LifeZen</strong><small>Your productivity space</small></div>
+ </div>
+ <div class="nav-label">WORKSPACE</div>
+ <nav class="nav">
+  <button class="active" data-page="dashboard"><span>◫</span>Dashboard</button>
+  <button data-page="tasks"><span>✓</span>My Tasks</button>
+  <button data-page="routines"><span>◷</span>My Routines</button>
+  <button data-page="habits"><span>◉</span>Habits</button>
+  <button data-page="goals"><span>◎</span>My Goals</button>
+  <button data-page="calendar"><span>▦</span>Calendar</button>
+ </nav>
+ <div class="nav-label">PREFERENCES</div>
+ <nav class="nav"><button data-page="settings"><span>⚙</span>Settings</button></nav>
+ <div class="side-note">✦ <b>Make every day count.</b><br>Small steps. Big changes.</div>
+</aside>
+
+<main>
+ <div class="top">
+  <div><h1 id="pageTitle">Dashboard</h1><p id="dateText">Your productivity space</p></div>
+  <div class="top-actions">
+   <button class="btn" onclick="toggleTheme()">◐</button>
+   <div class="avatar" id="avatar">L</div>
+  </div>
+ </div>
+
+ <section class="page active" id="dashboard">
+  <div class="welcome">
+   <div><h2 id="welcomeTitle">Welcome back! ✨</h2><p>Make today a little better than yesterday.</p></div>
+   <div class="welcome-icon">✦</div>
+  </div>
+  <div class="stats">
+   <div class="card"><div class="stat-label">Total tasks</div><div class="stat-value" id="total">0</div><div class="stat-foot">Your daily plan</div></div>
+   <div class="card"><div class="stat-label">Completed</div><div class="stat-value" id="completed">0</div><div class="stat-foot">One step forward</div></div>
+   <div class="card"><div class="stat-label">Habits</div><div class="stat-value" id="habitCount">0</div><div class="stat-foot">Build consistency</div></div>
+   <div class="card"><div class="stat-label">Goals</div><div class="stat-value" id="goalCount">0</div><div class="stat-foot">Keep growing</div></div>
+  </div>
+  <div class="content-grid">
+   <div class="card">
+    <div class="card-head"><h3>Today's tasks</h3><button class="btn" onclick="go('tasks')">View all →</button></div>
+    <div id="dashTasks" class="task-list"></div>
+    <p class="muted" id="dashProgressText"></p>
+    <div class="progress"><span id="dashProgress"></span></div>
+   </div>
+   <div class="card">
+    <div class="card-head"><h3>Daily focus</h3></div>
+    <p class="muted">What's your most important priority today?</p>
+    <input id="focus" placeholder="My main focus...">
+    <button class="btn primary" style="margin-top:10px;width:100%" onclick="saveFocus()">Save focus</button>
+    <p class="muted" id="focusStatus"></p>
+   </div>
+  </div>
+  <div class="card">
+   <div class="card-head"><h3>Today's routine</h3><button class="btn" onclick="go('routines')">Manage →</button></div>
+   <div id="dashRoutine"></div>
+  </div>
+ </section>
+
+ <section class="page" id="tasks">
+  <h2 class="section-title">My Tasks</h2><p class="section-sub">Organise your day, one task at a time.</p>
+  <div class="card">
+   <div class="card-head"><h3>Task manager</h3><span class="muted" id="taskCount">0 tasks</span></div>
+   <div id="allTasks" class="task-list"></div>
+   <div class="add-form">
+    <input id="taskName" placeholder="What do you need to do?">
+    <select id="category"><option>Personal</option><option>Study</option><option>College</option><option>Health</option><option>Work</option></select>
+    <input id="taskTime" type="time">
+    <button class="btn primary" id="taskButton" onclick="addTask()">+ Add task</button>
+   </div>
+  </div>
+ </section>
+
+ <section class="page" id="routines">
+  <h2 class="section-title">My Routines</h2>
+  <p class="section-sub">Create your own daily schedule and make it yours.</p>
+  <div class="card">
+   <div class="card-head"><h3>Your routines</h3><button class="btn" onclick="loadRoutinePreset()">＋ College preset</button></div>
+   <div id="routineList" class="routine-list"></div>
+   <button class="btn primary" style="width:100%;margin-top:14px" onclick="openRoutineForm()">＋ Create new routine</button>
+  </div>
+  <div class="card" id="routineEditor" style="display:none">
+   <div class="card-head"><h3 id="routineFormTitle">Create a routine</h3><button class="btn" onclick="closeRoutineForm()">Close ×</button></div>
+   <div class="form-grid">
+    <input class="full" id="routineName" placeholder="Routine name (e.g. College Day)">
+    <div class="full">
+     <div class="small-title">Add activities</div>
+     <div class="form-grid">
+      <input id="activityName" placeholder="Activity name">
+      <input id="activityTime" type="time">
+      <button class="btn primary full" onclick="addActivity()">＋ Add activity</button>
+     </div>
+    </div>
+    <div class="full">
+     <div class="small-title">Activities in this routine</div>
+     <div id="editorActivities"></div>
+    </div>
+    <button class="btn primary full" onclick="saveRoutine()">Save routine</button>
+   </div>
+  </div>
+ </section>
+
+ <section class="page" id="habits">
+  <h2 class="section-title">My Habits</h2><p class="section-sub">Build small habits that support your goals.</p>
+  <div class="card">
+   <div class="card-head"><h3>Daily habits</h3></div>
+   <div id="habitsList" class="habit-list"></div>
+   <div class="goal-row"><input id="habitInput" placeholder="Add a new habit..."><button class="btn primary" onclick="addHabit()">Add</button></div>
+  </div>
+ </section>
+
+ <section class="page" id="goals">
+  <h2 class="section-title">My Goals</h2><p class="section-sub">Keep your long-term goals visible.</p>
+  <div class="card">
+   <div class="card-head"><h3>Goals list</h3></div>
+   <div id="goalsList" class="goal-list"></div>
+   <div class="goal-row"><input id="goalInput" placeholder="Write a goal..."><button class="btn primary" onclick="addGoal()">Add goal</button></div>
+  </div>
+ </section>
+
+ <section class="page" id="calendar">
+  <h2 class="section-title">Calendar</h2><p class="section-sub">Your current month at a glance.</p>
+  <div class="card">
+   <div class="card-head"><button class="btn" onclick="monthMove(-1)">←</button><h3 id="monthTitle"></h3><button class="btn" onclick="monthMove(1)">→</button></div>
+   <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
+ </section>
+
+ <section class="page" id="settings">
+  <h2 class="section-title">Settings</h2><p class="section-sub">Make LifeZen work the way you like.</p>
+  <div class="card">
+   <div class="setting"><div><b>Profile name</b><p class="muted">Name displayed in your workspace</p></div><input id="profileName" placeholder="Your name" style="max-width:150px"></div>
+   <div class="setting"><div><b>Appearance</b><p class="muted">Light or dark mode</p></div><button class="btn" onclick="toggleTheme()">Change theme</button></div>
+   <div class="setting"><div><b>Language</b><p class="muted">Choose your preferred language</p></div><select id="language" onchange="setLanguage(this.value)" style="max-width:130px"><option value="en">English</option><option value="hi">हिंदी</option></select></div>
+   <div class="setting"><div><b>Backup your data</b><p class="muted">Download tasks, routines, habits and goals</p></div><button class="btn" onclick="backup()">Download</button></div>
+   <div class="setting"><div><b>Restore backup</b><p class="muted">Import a previous backup</p></div><input type="file" accept=".json" onchange="restore(event)" style="max-width:150px"></div>
+   <div class="setting"><div><b>Reset workspace</b><p class="muted">Clear all locally stored app data</p></div><button class="btn danger" onclick="resetApp()">Reset</button></div>
+   <p class="muted">LifeZen v5.1 • Your data stays in this browser.</p>
+  </div>
+ </section>
+</main>
+</div>
+
+<nav class="mobile-nav">
+ <button class="active" data-page="dashboard"><span>◫</span>Home</button>
+ <button data-page="tasks"><span>✓</span>Tasks</button>
+ <button data-page="routines"><span>◷</span>Routines</button>
+ <button data-page="habits"><span>◉</span>Habits</button>
+ <button data-page="settings"><span>⚙</span>Settings</button>
+</nav>
+
+<script>
+const KEY="lifezen_v5_data";
+const oldKey="lifezen_v4_data";
+let state;
+try{
+ state=JSON.parse(localStorage.getItem(KEY)||"null");
+ if(!state){
+  const old=JSON.parse(localStorage.getItem(oldKey)||"null");
+  state=old||{};
+ }
+}catch(e){state={}}
+state={
+ tasks:Array.isArray(state.tasks)?state.tasks:[],
+ habits:Array.isArray(state.habits)?state.habits:[],
+ goals:Array.isArray(state.goals)?state.goals:[],
+ routines:Array.isArray(state.routines)?state.routines:[],
+ focus:state.focus||"",name:state.name||"",
+ language:state.language||"en",
+ lastDay:state.lastDay||new Date().toDateString()
+};
+let editingTask=-1,editingRoutine=-1,editorActivities=[];
+let month=new Date().getMonth(),year=new Date().getFullYear();
+const $=id=>document.getElementById(id);
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+
+function dailyCheck(){
+ const today=new Date().toDateString();
+ if(state.lastDay!==today){
+  state.tasks.forEach(t=>t.done=false);
+  state.habits.forEach(h=>h.done=false);
+  state.routines.forEach(r=>{
+   (r.activities||[]).forEach(a=>a.done=false);
+  });
+  state.lastDay=today;
+  save();
+ }
+}
+
+function go(page){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ $(page).classList.add("active");
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+ const names={dashboard:"Dashboard",tasks:"My Tasks",routines:"My Routines",habits:"Habits",goals:"My Goals",calendar:"Calendar",settings:"Settings"};
+ $("pageTitle").textContent=names[page]||"LifeZen";
+ if(page==="calendar")drawCalendar();
+ if(page==="routines")renderRoutines();
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page));
+
+function makeTask(t,i){
+ const row=document.createElement("div");
+ row.className="task"+(t.done?" done":"");
+ const check=document.createElement("input");
+ check.type="checkbox";check.checked=!!t.done;
+ check.onchange=()=>{state.tasks[i].done=check.checked;save();render()};
+ const info=document.createElement("div");info.className="task-info";
+ const name=document.createElement("div");name.className="task-name";name.textContent=t.name;
+ const meta=document.createElement("div");meta.className="task-meta";meta.textContent=(t.category||"Personal")+(t.time?" • "+t.time:"");
+ info.append(name,meta);
+ const edit=document.createElement("button");edit.className="edit";edit.textContent="✎";edit.onclick=()=>editTask(i);
+ const del=document.createElement("button");del.className="del";del.textContent="×";
+ del.onclick=()=>{if(confirm("Delete task?")){state.tasks.splice(i,1);save();render()}};
+ row.append(check,info,edit,del);
+ return row;
+}
+
+function renderTasks(){
+ $("allTasks").innerHTML="";$("dashTasks").innerHTML="";
+ state.tasks.forEach((t,i)=>{
+  $("allTasks").append(makeTask(t,i));
+  if(i<5)$("dashTasks").append(makeTask(t,i));
+ });
+ if(!state.tasks.length){
+  $("allTasks").innerHTML='<div class="empty">No tasks yet. Add your first task above.</div>';
+  $("dashTasks").innerHTML='<div class="empty">Your daily plan starts here.</div>';
+ }
+ $("taskCount").textContent=state.tasks.length+" tasks";
+ $("taskButton").textContent=editingTask<0?"+ Add task":"Save changes";
+}
+
+function addTask(){
+ const name=$("taskName").value.trim();
+ if(!name)return alert("Write a task first.");
+ const t={name,category:$("category").value,time:$("taskTime").value,done:false};
+ if(editingTask>=0){state.tasks[editingTask]=t;editingTask=-1}
+ else state.tasks.push(t);
+ $("taskName").value="";$("taskTime").value="";
+ save();render();
+}
+
+function editTask(i){
+ editingTask=i;const t=state.tasks[i];
+ $("taskName").value=t.name;$("category").value=t.category||"Personal";
+ $("taskTime").value=t.time||"";
+ $("taskButton").textContent="Save changes";go("tasks");$("taskName").focus();
+}
+
+function addHabit(){
+ const v=$("habitInput").value.trim();if(!v)return;
+ state.habits.push({name:v,done:false});$("habitInput").value="";save();render();
+}
+
+function renderHabits(){
+ $("habitsList").innerHTML="";
+ state.habits.forEach((h,i)=>{
+  const row=document.createElement("div");row.className="habit";
+  const c=document.createElement("input");c.type="checkbox";c.checked=!!h.done;
+  c.onchange=()=>{state.habits[i].done=c.checked;save();render()};
+  const s=document.createElement("span");s.textContent=h.name;
+  const d=document.createElement("button");d.className="del";d.textContent="×";
+  d.onclick=()=>{state.habits.splice(i,1);save();render()};
+  row.append(c,s,d);$("habitsList").append(row);
+ });
+ if(!state.habits.length)$("habitsList").innerHTML='<div class="empty">Add habits you want to build.</div>';
+}
+
+function addGoal(){
+ const v=$("goalInput").value.trim();if(!v)return;
+ state.goals.push({name:v,done:false});$("goalInput").value="";save();render();
+}
+
+function renderGoals(){
+ $("goalsList").innerHTML="";
+ state.goals.forEach((g,i)=>{
+  const row=document.createElement("div");row.className="goal";
+  const c=document.createElement("input");c.type="checkbox";c.checked=!!g.done;
+  c.onchange=()=>{state.goals[i].done=c.checked;save();render()};
+  const s=document.createElement("span");s.textContent=g.name;
+  if(g.done)s.style.textDecoration="line-through";
+  const d=document.createElement("button");d.className="del";d.textContent="×";
+  d.onclick=()=>{state.goals.splice(i,1);save();render()};
+  row.append(c,s,d);$("goalsList").append(row);
+ });
+ if(!state.goals.length)$("goalsList").innerHTML='<div class="empty">Your goals will appear here.</div>';
+}
+
+function renderStats(){
+ const total=state.tasks.length,done=state.tasks.filter(t=>t.done).length;
+ const p=total?Math.round(done/total*100):0;
+ $("total").textContent=total;$("completed").textContent=done;
+ $("habitCount").textContent=state.habits.length;$("goalCount").textContent=state.goals.length;
+ $("dashProgress").style.width=p+"%";
+ $("dashProgressText").textContent=p+"% of your tasks completed";
+}
+
+function render(){
+ renderTasks();renderHabits();renderGoals();renderStats();
+ renderRoutines();renderDashboardRoutine();
+}
+
+function saveFocus(){
+ state.focus=$("focus").value;save();
+ $("focusStatus").textContent="Focus saved ✓";
+}
+
+function toggleTheme(){
+ document.body.classList.toggle("dark");
+ localStorage.setItem("lifezen_theme",document.body.classList.contains("dark")?"dark":"light");
+}
+
+function setLanguage(v){state.language=v;save();applyLanguage()}
+
+function applyLanguage(){
+ $("language").value=state.language||"en";
+ if(state.language==="hi"){
+  $("pageTitle").textContent="डैशबोर्ड";
+  $("welcomeTitle").textContent="वापसी पर स्वागत है! ✨";
+  $("dateText").textContent="आपकी व्यक्तिगत उत्पादकता जगह";
+ }else{
+  $("pageTitle").textContent="Dashboard";
+  $("welcomeTitle").textContent="Welcome back"+(state.name?", "+state.name:"")+"! ✨";
+ }
+}
+
+function backup(){
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="lifezen-backup.json";a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function restore(e){
+ const f=e.target.files[0];if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{
+  try{
+   const d=JSON.parse(r.result);
+   if(!Array.isArray(d.tasks)||!Array.isArray(d.goals)||!Array.isArray(d.habits))throw Error();
+   state={...state,...d,routines:Array.isArray(d.routines)?d.routines:[]};
+   save();render();applyLanguage();alert("Backup restored!");
+  }catch(err){alert("Invalid backup file")}
+  e.target.value="";
+ };
+ r.readAsText(f);
+}
+
+function resetApp(){
+ if(confirm("This will delete your local LifeZen data. Continue?")){
+  localStorage.removeItem(KEY);localStorage.removeItem(oldKey);location.reload();
+ }
+}
+
+/* ROUTINE BUILDER */
+
+function openRoutineForm(index=-1){
+ editingRoutine=index;
+ editorActivities=index>=0?JSON.parse(JSON.stringify(state.routines[index].activities||[])):[];
+ $("routineName").value=index>=0?state.routines[index].name:"";
+ $("routineFormTitle").textContent=index>=0?"Edit routine":"Create a routine";
+ $("routineEditor").style.display="block";
+ renderEditorActivities();
+ $("routineName").focus();
+}
+
+function closeRoutineForm(){
+ $("routineEditor").style.display="none";
+ editingRoutine=-1;editorActivities=[];
+}
+
+function addActivity(){
+ const name=$("activityName").value.trim(),time=$("activityTime").value;
+ if(!name)return alert("Enter an activity name.");
+ editorActivities.push({name,time,done:false});
+ $("activityName").value="";$("activityTime").value="";
+ renderEditorActivities();
+}
+
+function renderEditorActivities(){
+ const box=$("editorActivities");box.innerHTML="";
+ if(!editorActivities.length){
+  box.innerHTML='<div class="empty">No activities added yet.</div>';return;
+ }
+ editorActivities.forEach((a,i)=>{
+  const row=document.createElement("div");row.className="routine-activity";
+  const time=document.createElement("span");time.className="routine-time";time.textContent=a.time||"Any time";
+  const name=document.createElement("span");name.className="activity-name";name.textContent=a.name;
+  const del=document.createElement("button");del.className="del";del.textContent="×";
+  del.onclick=()=>{editorActivities.splice(i,1);renderEditorActivities()};
+  row.append(time,name,del);box.append(row);
+ });
+}
+
+function saveRoutine(){
+ const name=$("routineName").value.trim();
+ if(!name)return alert("Please enter a routine name.");
+ if(!editorActivities.length)return alert("Add at least one activity.");
+ editorActivities.sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"));
+ const routine={name,activities:editorActivities};
+ if(editingRoutine>=0){
+  state.routines[editingRoutine]=routine;
+ }else{
+  state.routines.push(routine);
+ }
+ save();closeRoutineForm();render();
+ alert("Routine saved successfully!");
+}
+
+/* ROUTINE CHECKBOXES */
+
+function makeRoutineActivity(activity,onChange){
+ const row=document.createElement("div");
+ row.className="routine-activity"+(activity.done?" completed":"");
+
+ const check=document.createElement("input");
+ check.type="checkbox";
+ check.checked=!!activity.done;
+ check.setAttribute("aria-label","Mark "+activity.name+" as complete");
+
+ check.onchange=()=>{
+  onChange(check.checked);
+ };
+
+ const time=document.createElement("span");
+ time.className="routine-time";
+ time.textContent=activity.time||"Any time";
+
+ const name=document.createElement("span");
+ name.className="activity-name";
+ name.textContent=activity.name;
+
+ row.append(check,time,name);
+ return row;
+}
+
+function renderRoutines(){
+ const box=$("routineList");
+ if(!box)return;
+ box.innerHTML="";
+
+ if(!state.routines.length){
+  box.innerHTML='<div class="empty">No routines yet. Create your first routine or add the College preset.</div>';
+  return;
+ }
+
+ state.routines.forEach((r,i)=>{
+  const card=document.createElement("div");
+  card.className="routine-card";
+
+  const top=document.createElement("div");
+  top.className="routine-top";
+
+  const title=document.createElement("strong");
+  title.textContent=r.name;
+
+  const actions=document.createElement("div");
+  actions.className="routine-actions";
+
+  const edit=document.createElement("button");
+  edit.className="btn";
+  edit.textContent="Edit";
+  edit.onclick=()=>openRoutineForm(i);
+
+  const del=document.createElement("button");
+  del.className="btn danger";
+  del.textContent="Delete";
+  del.onclick=()=>{
+   if(confirm("Delete this routine?")){
+    state.routines.splice(i,1);
+    save();render();
+   }
+  };
+
+  actions.append(edit,del);
+  top.append(title,actions);
+  card.append(top);
+
+  const activities=r.activities||[];
+  const done=activities.filter(a=>a.done).length;
+
+  activities.forEach((a,j)=>{
+   card.append(makeRoutineActivity(a,checked=>{
+    state.routines[i].activities[j].done=checked;
+    save();render();
+   }));
+  });
+
+  const progress=document.createElement("div");
+  progress.className="routine-progress";
+  progress.textContent=done+" of "+activities.length+" activities completed";
+  card.append(progress);
+
+  box.append(card);
+ });
+}
+
+function renderDashboardRoutine(){
+ const box=$("dashRoutine");
+ if(!box)return;
+ box.innerHTML="";
+
+ if(!state.routines.length){
+  box.innerHTML='<div class="empty">Create a routine to see it here.</div>';
+  return;
+ }
+
+ const r=state.routines[0];
+ const activities=r.activities||[];
+
+ const title=document.createElement("b");
+ title.textContent=r.name;
+ box.append(title);
+
+ const done=activities.filter(a=>a.done).length;
+
+ activities.forEach((a,i)=>{
+  box.append(makeRoutineActivity(a,checked=>{
+   state.routines[0].activities[i].done=checked;
+   save();render();
+  }));
+ });
+
+ const progress=document.createElement("div");
+ progress.className="routine-progress";
+ progress.textContent=done+" of "+activities.length+" activities completed";
+ box.append(progress);
+}
+
+function loadRoutinePreset(){
+ const exists=state.routines.some(r=>r.name==="College Day");
+ if(exists)return alert("College Day preset is already in your routines.");
+
+ state.routines.push({
+  name:"College Day",
+  activities:[
+   {time:"07:00",name:"Wake up and freshen up",done:false},
+   {time:"07:30",name:"Exercise and breakfast",done:false},
+   {time:"08:00",name:"Get ready for college",done:false},
+   {time:"09:00",name:"Leave for college",done:false},
+   {time:"15:00",name:"College ends",done:false},
+   {time:"16:00",name:"Rest and personal time",done:false},
+   {time:"17:00",name:"BA study session",done:false},
+   {time:"18:30",name:"English practice",done:false},
+   {time:"20:00",name:"Dinner and family time",done:false},
+   {time:"21:00",name:"BCA study session",done:false},
+   {time:"22:00",name:"Plan tomorrow and relax",done:false}
+  ]
+ });
+
+ save();render();
+ alert("College Day preset added! You can now tick each activity.");
+}
+
+/* CALENDAR */
+
+function drawCalendar(){
+ $("monthTitle").textContent=new Date(year,month,1).toLocaleDateString("en",{month:"long",year:"numeric"});
+ const first=new Date(year,month,1).getDay(),days=new Date(year,month+1,0).getDate();
+ const grid=$("calendarGrid");grid.innerHTML="";
+ ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(x=>{
+  const el=document.createElement("div");el.className="day";el.textContent=x;grid.append(el);
+ });
+ for(let i=0;i<first;i++)grid.append(document.createElement("div"));
+ for(let d=1;d<=days;d++){
+  const el=document.createElement("div");el.className="day";
+  if(d===new Date().getDate()&&month===new Date().getMonth()&&year===new Date().getFullYear())el.classList.add("today");
+  el.textContent=d;grid.append(el);
+ }
+}
+
+function monthMove(n){
+ month+=n;
+ if(month<0){month=11;year--}
+ if(month>11){month=0;year++}
+ drawCalendar();
+}
+
+/* PROFILE AND STARTUP */
+
+const now=new Date();
+$("dateText").textContent=now.toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+if(localStorage.getItem("lifezen_theme")==="dark")document.body.classList.add("dark");
+$("focus").value=state.focus||"";
+$("profileName").value=state.name||"";
+
+function updateProfile(){
+ state.name=$("profileName").value.trim();
+ $("avatar").textContent=(state.name[0]||"L").toUpperCase();
+ $("welcomeTitle").textContent="Welcome back"+(state.name?", "+state.name:"")+"! ✨";
+ save();
+}
+
+$("profileName").onchange=updateProfile;
+$("avatar").textContent=(state.name||"L")[0].toUpperCase();
+
+dailyCheck();
+render();
+applyLanguage();
+drawCalendar();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then(() => console.log("LifeZen offline support ready!"))
+      .catch((error) =>
+        console.error("Service Worker error:", error)
+      );
+  });
+}
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./sw.js")
+      .then(() => console.log("LifeZen offline support ready!"))
+      .catch((error) =>
+        console.error("Service Worker error:", error)
+      );
+  });
+}
+</script>
+</body>
+</html>

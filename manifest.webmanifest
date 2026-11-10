@@ -1,0 +1,12 @@
+{
+  "name": "LifeZen - Daily Planner",
+  "short_name": "LifeZen",
+  "description": "Plan your day, build routines and track your progress.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f3ff",
+  "theme_color": "#6c63ff",
+  "lang": "en"
+}
