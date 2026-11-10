@@ -2,781 +2,357 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#6856e8">
-<title>LifeZen — Your Productivity Space</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6757e8">
+<meta name="description" content="LifeZen - Plan your day, build routines and track your progress.">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>LifeZen — Your Daily Space</title>
+
 <style>
 :root{
- --bg:#f5f6fc;--card:#fff;--text:#25243a;--muted:#88889d;
- --line:#e9e9f1;--purple:#705ce8;--soft:#f0edff;
- --green:#27ae83;--red:#e56c78;
+  --bg:#f5f6fc;--card:#fff;--text:#24243a;--muted:#85859b;
+  --purple:#6b5ce7;--purple2:#8c70f0;--border:#ececf4;
+  --green:#20b889;--red:#ef6478;--shadow:0 8px 28px rgba(45,40,100,.06);
 }
 body.dark{
- --bg:#151522;--card:#222235;--text:#f4f2ff;--muted:#aaa8c0;
- --line:#38384d;--purple:#a99aff;--soft:#35304e;
- --green:#5bd4aa;--red:#ff8794;
+  --bg:#151522;--card:#202031;--text:#f4f2ff;--muted:#aaa8bd;
+  --border:#343348;--shadow:0 8px 28px rgba(0,0,0,.2);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-button,input,select{font:inherit}
-button{cursor:pointer;border:0}
-.layout{display:flex;min-height:100vh}
-.sidebar{
- width:230px;background:var(--card);border-right:1px solid var(--line);
- padding:24px 16px;position:fixed;inset:0 auto 0 0;
- display:flex;flex-direction:column;z-index:5
-}
-.brand{display:flex;align-items:center;gap:11px;padding:0 8px 30px}
-.logo{
- width:42px;height:42px;border-radius:14px;
- background:linear-gradient(135deg,#6755e8,#bb7cf0);
- color:white;display:grid;place-items:center;font-size:23px
-}
-.brand strong{font-size:21px}
-.brand small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
-.nav-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);padding:12px 10px}
-.nav button{
- width:100%;padding:12px;border-radius:10px;background:transparent;
- color:var(--muted);text-align:left;margin:3px 0;font-weight:600
-}
-.nav button.active,.nav button:hover{background:var(--soft);color:var(--purple)}
-.nav button span{display:inline-block;width:27px}
-.side-note{margin-top:auto;padding:13px;background:var(--soft);border-radius:12px;font-size:12px;color:var(--muted)}
-main{margin-left:230px;width:calc(100% - 230px);padding:27px 30px;max-width:1500px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:25px}
-.top h1{font-size:25px;margin:0}
-.top p{margin:5px 0 0;color:var(--muted);font-size:13px}
-.top-actions{display:flex;gap:9px;align-items:center}
-.btn{padding:10px 14px;border-radius:10px;background:var(--soft);color:var(--purple);font-weight:600}
-.primary{background:linear-gradient(120deg,#6856e8,#9b6dec);color:white}
-.danger{background:#ffe9ec;color:#c94e61}
-.avatar{width:39px;height:39px;border-radius:50%;background:var(--soft);color:var(--purple);display:grid;place-items:center;font-weight:bold}
-.page{display:none}
-.page.active{display:block}
-.welcome{
- padding:27px;border-radius:18px;color:white;
- background:linear-gradient(115deg,#5d54dc,#8e68e9 70%,#bc7ce9);
- margin-bottom:19px;display:flex;justify-content:space-between;align-items:center
-}
-.welcome h2{font-size:23px;margin:0 0 8px}
-.welcome p{margin:0;opacity:.9;font-size:13px}
-.welcome-icon{font-size:45px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:19px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:17px}
-.stat-label{font-size:12px;color:var(--muted)}
-.stat-value{font-size:27px;font-weight:750;margin:10px 0 4px}
-.stat-foot{font-size:11px;color:var(--green)}
-.content-grid{display:grid;grid-template-columns:1.3fr .8fr;gap:16px}
-.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
-h3{font-size:16px;margin:0}
-.muted{font-size:12px;color:var(--muted)}
-.task-list,.habit-list,.goal-list,.routine-list{display:grid;gap:9px}
-.task,.habit,.goal,.routine-card{
- display:flex;align-items:center;gap:10px;padding:11px;
- border:1px solid var(--line);border-radius:10px
-}
-.task input,.habit input,.goal input{accent-color:var(--purple);width:17px;height:17px}
-.task-info{flex:1;min-width:0}
-.task-name{font-size:13px;font-weight:650;overflow-wrap:anywhere}
-.task-meta{font-size:11px;color:var(--muted);margin-top:5px}
-.task.done .task-name{text-decoration:line-through;color:var(--muted)}
-.goal span,.habit span{flex:1;font-size:13px}
-.del,.edit{background:transparent;color:var(--muted);padding:5px;font-size:17px}
-input,select{
- background:var(--bg);border:1px solid var(--line);border-radius:9px;
- padding:11px;color:var(--text);min-width:0;width:100%
-}
-.add-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
-.add-form input:first-child,.add-form button{grid-column:1/-1}
-.goal-row{display:flex;gap:8px;margin-top:12px}
-.goal-row input{flex:1}
-.progress{height:8px;background:var(--line);border-radius:20px;overflow:hidden;margin:12px 0}
-.progress span{height:100%;display:block;background:linear-gradient(90deg,#705ce8,#bc7cf0);width:0;transition:.3s}
-.empty{text-align:center;color:var(--muted);padding:19px;font-size:13px}
-.section-title{font-size:21px;margin:0 0 6px}
-.section-sub{color:var(--muted);font-size:13px;margin:0 0 19px}
-.setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
-.setting p{margin:5px 0 0}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
-.day{padding:13px 4px;border:1px solid var(--line);border-radius:9px;text-align:center;font-size:12px;color:var(--muted)}
-.day.today{background:var(--soft);border-color:var(--purple);color:var(--purple);font-weight:bold}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;transition:.2s}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--card);border-right:1px solid var(--border);padding:25px 17px;position:fixed;inset:0 auto 0 0;display:flex;flex-direction:column;z-index:10}
+.brand{display:flex;align-items:center;gap:11px;padding:0 10px 32px;font-size:22px;font-weight:850;letter-spacing:-.7px}
+.logo{width:39px;height:39px;border-radius:13px;background:linear-gradient(135deg,#5145d9,#b276ed);display:grid;place-items:center;color:white;font-size:20px;box-shadow:0 5px 15px #7864df55}
+.nav-label{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:1.5px;padding:10px}
+.nav button{display:flex;align-items:center;gap:13px;width:100%;border:0;background:transparent;color:var(--muted);padding:12px 13px;margin:3px 0;border-radius:12px;text-align:left;font-size:14px;font-weight:650}
+.nav button.active,.nav button:hover{background:#eeeaff;color:var(--purple)}
+body.dark .nav button.active,body.dark .nav button:hover{background:#34304e;color:#b8aaff}
+.sidebar-bottom{margin-top:auto}
+.profile{display:flex;align-items:center;gap:10px;padding:14px 8px 3px;border-top:1px solid var(--border)}
+.avatar{width:37px;height:37px;border-radius:50%;background:linear-gradient(135deg,#b7a2ff,#edb5d9);display:grid;place-items:center;color:#39305d;font-weight:800}
+.profile small{display:block;color:var(--muted);margin-top:3px}
+main{margin-left:245px;width:calc(100% - 245px);padding:30px 38px 55px;max-width:1500px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;gap:12px}
+.top h1{font-size:25px;margin:0;letter-spacing:-.6px}
+.top p{color:var(--muted);font-size:13px;margin:6px 0 0}
+.top-actions{display:flex;gap:9px}
+.icon-btn{width:42px;height:42px;border:1px solid var(--border);border-radius:13px;background:var(--card);color:var(--text);font-size:18px}
+.welcome{background:linear-gradient(115deg,#5145d9,#8061e9 65%,#b47ce8);color:white;padding:27px 30px;border-radius:23px;display:flex;justify-content:space-between;align-items:center;min-height:155px;box-shadow:0 12px 30px #7964dc30;margin-bottom:20px}
+.welcome h2{font-size:25px;margin:0 0 9px}.welcome p{margin:0;color:#eeeaff;font-size:13px}
+.welcome-icon{font-size:52px;opacity:.9}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:19px;box-shadow:var(--shadow);margin-bottom:15px}
+.stat-card{min-height:116px}.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;font-weight:650}
+.stat-icon{font-size:20px}.stat-value{font-size:29px;font-weight:850;margin-top:13px}
+.content-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:15px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.card-head h3{font-size:16px;margin:0}.muted{color:var(--muted);font-size:12px}
+.btn{border:0;background:var(--purple);color:white;padding:10px 15px;border-radius:10px;font-weight:700;font-size:12px}
+.btn:hover{filter:brightness(1.08)}.btn.light{background:#eeeaff;color:var(--purple)}
+body.dark .btn.light{background:#393451;color:#c6bbff}
+.btn.danger{background:#fff0f1;color:#d84f66}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;min-width:0}
+input:focus,select:focus,textarea:focus{border-color:var(--purple)}
+.add-form{display:flex;gap:8px;margin-bottom:14px}.add-form input{flex:1}
+.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:0}
+.item input[type=checkbox]{width:18px;height:18px;accent-color:var(--purple)}
+.item-name{flex:1;font-size:13px;overflow-wrap:anywhere}
+.item.done .item-name{text-decoration:line-through;color:var(--muted)}
+.delete{border:0;background:transparent;color:var(--muted);font-size:17px;padding:5px}
+.empty{padding:20px 5px;text-align:center;color:var(--muted);font-size:13px}
+.progress{height:8px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:10px}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#6557e7,#b17ce9);border-radius:20px}
+.page{display:none}.page.active{display:block}
+.section-note{color:var(--muted);font-size:13px;margin:-12px 0 20px}
+.routine-row{padding:13px;border:1px solid var(--border);border-radius:13px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.routine-row strong{font-size:13px}.routine-row small{display:block;color:var(--muted);margin-top:5px}
+.tag{font-size:10px;padding:5px 9px;background:#eeeaff;color:var(--purple);border-radius:20px}
+body.dark .tag{background:#393451;color:#c6bbff}
+.setting-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:15px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border:0}.setting-row strong{font-size:14px}.setting-row small{display:block;color:var(--muted);margin-top:5px;font-size:12px}
+.setting-row select{max-width:160px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;text-align:center}
+.calendar-grid div{padding:12px 2px;border-radius:9px;font-size:12px}
+.calendar-grid .day{color:var(--muted);font-weight:700}
+.calendar-grid .today{background:var(--purple);color:white;font-weight:800}
 .mobile-nav{display:none}
-.routine-card{display:block;padding:15px}
-.routine-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.routine-top strong{font-size:15px}
-.routine-actions{display:flex;gap:5px}
-.routine-activity{
- display:flex;align-items:center;gap:10px;padding:10px 0;
- border-bottom:1px solid var(--line);font-size:13px
-}
-.routine-activity:last-child{border:0}
-.routine-time{color:var(--purple);font-weight:bold;min-width:65px;font-size:12px}
-.routine-activity span.activity-name{flex:1}
-.routine-activity input[type="checkbox"]{
- width:18px;height:18px;accent-color:var(--purple);
- cursor:pointer;flex-shrink:0
-}
-.routine-activity.completed .activity-name{
- text-decoration:line-through;color:var(--muted)
-}
-.routine-progress{font-size:12px;color:var(--muted);margin-top:12px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-grid .full{grid-column:1/-1}
-.small-title{font-size:13px;color:var(--muted);margin:15px 0 8px}
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#28243c;color:white;padding:12px 19px;border-radius:12px;font-size:13px;z-index:50;display:none;box-shadow:var(--shadow)}
 @media(max-width:900px){
- .sidebar{width:195px}
- main{margin-left:195px;width:calc(100% - 195px);padding:22px}
+ .sidebar{width:205px}main{margin-left:205px;width:calc(100% - 205px);padding:25px 20px}
  .stats{grid-template-columns:repeat(2,1fr)}
- .content-grid{grid-template-columns:1fr}
 }
 @media(max-width:650px){
- .sidebar{display:none}
- main{margin:0;width:100%;padding:16px 13px 85px}
- .top h1{font-size:21px}
- .welcome{padding:20px}
- .stats{gap:9px}
- .card{padding:14px}
- .mobile-nav{
-  display:flex;position:fixed;bottom:0;left:0;right:0;
-  background:var(--card);border-top:1px solid var(--line);
-  justify-content:space-around;padding:9px 2px;z-index:8
- }
- .mobile-nav button{background:transparent;color:var(--muted);font-size:10px;padding:5px}
- .mobile-nav button.active{color:var(--purple)}
- .mobile-nav span{display:block;font-size:19px;margin-bottom:3px}
- .form-grid{grid-template-columns:1fr}
- .form-grid .full{grid-column:auto}
+ .sidebar{display:none}main{margin:0;width:100%;padding:18px 13px 100px}
+ .top h1{font-size:22px}.top{margin-bottom:18px}
+ .welcome{padding:22px 19px;min-height:140px;border-radius:20px}
+ .welcome h2{font-size:21px}.welcome-icon{font-size:40px}
+ .stats{gap:10px}.stat-card{padding:15px;min-height:105px;border-radius:16px}
+ .stat-value{font-size:26px}.content-grid{grid-template-columns:1fr;gap:0}
+ .card{padding:16px;border-radius:16px}
+ .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:8px 2px calc(8px + env(safe-area-inset-bottom));z-index:20;justify-content:space-around}
+ .mobile-nav button{border:0;background:transparent;color:var(--muted);font-size:10px;font-weight:650;display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+ .mobile-nav button span{font-size:20px}.mobile-nav button.active{color:var(--purple)}
+ .add-form{flex-wrap:wrap}.add-form input{min-width:100%}
 }
 </style>
-<link rel="manifest" href="./manifest.webmanifest">
 </head>
+
 <body>
-<div class="layout">
+<div class="app">
 <aside class="sidebar">
- <div class="brand">
-  <div class="logo">✦</div>
-  <div><strong>LifeZen</strong><small>Your productivity space</small></div>
- </div>
+ <div class="brand"><div class="logo">✦</div>LifeZen</div>
  <div class="nav-label">WORKSPACE</div>
- <nav class="nav">
-  <button class="active" data-page="dashboard"><span>◫</span>Dashboard</button>
-  <button data-page="tasks"><span>✓</span>My Tasks</button>
-  <button data-page="routines"><span>◷</span>My Routines</button>
-  <button data-page="habits"><span>◉</span>Habits</button>
-  <button data-page="goals"><span>◎</span>My Goals</button>
-  <button data-page="calendar"><span>▦</span>Calendar</button>
+ <nav class="nav" id="sideNav">
+  <button class="active" data-page="dashboard">⌂ Dashboard</button>
+  <button data-page="tasks">✓ Tasks</button>
+  <button data-page="routines">◷ Routines</button>
+  <button data-page="habits">◎ Habits</button>
+  <button data-page="goals">◇ Goals</button>
+  <button data-page="calendar">▦ Calendar</button>
+  <div class="nav-label">PERSONAL</div>
+  <button data-page="settings">⚙ Settings</button>
  </nav>
- <div class="nav-label">PREFERENCES</div>
- <nav class="nav"><button data-page="settings"><span>⚙</span>Settings</button></nav>
- <div class="side-note">✦ <b>Make every day count.</b><br>Small steps. Big changes.</div>
+ <div class="sidebar-bottom">
+  <div class="profile"><div class="avatar" id="avatar">B</div><div><strong id="sideName">My Profile</strong><small>LifeZen member</small></div></div>
+ </div>
 </aside>
 
 <main>
- <div class="top">
-  <div><h1 id="pageTitle">Dashboard</h1><p id="dateText">Your productivity space</p></div>
-  <div class="top-actions">
-   <button class="btn" onclick="toggleTheme()">◐</button>
-   <div class="avatar" id="avatar">L</div>
+<header class="top">
+ <div><h1 id="pageTitle">Dashboard</h1><p id="dateText"></p></div>
+ <div class="top-actions">
+  <button class="icon-btn" onclick="toggleTheme()" title="Change theme">◐</button>
+  <button class="icon-btn" onclick="showPage('settings')" title="Settings">⚙</button>
+ </div>
+</header>
+
+<section class="page active" id="dashboard">
+ <div class="welcome">
+  <div><h2 id="greeting">Welcome back! 👋</h2><p>Make today count. One step at a time.</p></div>
+  <div class="welcome-icon">✦</div>
+ </div>
+ <div class="stats">
+  <div class="card stat-card"><div class="stat-top">Today's tasks <span class="stat-icon">✓</span></div><div class="stat-value" id="taskStat">0/0</div></div>
+  <div class="card stat-card"><div class="stat-top">Habits done <span class="stat-icon">◎</span></div><div class="stat-value" id="habitStat">0/0</div></div>
+  <div class="card stat-card"><div class="stat-top">Active goals <span class="stat-icon">◇</span></div><div class="stat-value" id="goalStat">0</div></div>
+  <div class="card stat-card"><div class="stat-top">Daily progress <span class="stat-icon">↗</span></div><div class="stat-value" id="progressStat">0%</div></div>
+ </div>
+ <div class="content-grid">
+  <div class="card">
+   <div class="card-head"><h3>Today's Tasks</h3><button class="btn light" onclick="showPage('tasks')">View all</button></div>
+   <div id="dashTasks"></div>
+  </div>
+  <div class="card">
+   <div class="card-head"><h3>Daily Focus</h3><span class="tag">Today</span></div>
+   <textarea id="focusInput" rows="3" placeholder="What matters most today?"></textarea>
+   <button class="btn" style="margin-top:10px" onclick="saveFocus()">Save focus</button>
+  </div>
+  <div class="card">
+   <div class="card-head"><h3>My Habits</h3><button class="btn light" onclick="showPage('habits')">View all</button></div>
+   <div id="dashHabits"></div>
+  </div>
+  <div class="card">
+   <div class="card-head"><h3>Daily inspiration</h3><span>✧</span></div>
+   <p style="line-height:1.8;font-size:14px">Small steps every day lead to big changes. Stay consistent and believe in your progress.</p>
   </div>
  </div>
+</section>
 
- <section class="page active" id="dashboard">
-  <div class="welcome">
-   <div><h2 id="welcomeTitle">Welcome back! ✨</h2><p>Make today a little better than yesterday.</p></div>
-   <div class="welcome-icon">✦</div>
-  </div>
-  <div class="stats">
-   <div class="card"><div class="stat-label">Total tasks</div><div class="stat-value" id="total">0</div><div class="stat-foot">Your daily plan</div></div>
-   <div class="card"><div class="stat-label">Completed</div><div class="stat-value" id="completed">0</div><div class="stat-foot">One step forward</div></div>
-   <div class="card"><div class="stat-label">Habits</div><div class="stat-value" id="habitCount">0</div><div class="stat-foot">Build consistency</div></div>
-   <div class="card"><div class="stat-label">Goals</div><div class="stat-value" id="goalCount">0</div><div class="stat-foot">Keep growing</div></div>
-  </div>
-  <div class="content-grid">
-   <div class="card">
-    <div class="card-head"><h3>Today's tasks</h3><button class="btn" onclick="go('tasks')">View all →</button></div>
-    <div id="dashTasks" class="task-list"></div>
-    <p class="muted" id="dashProgressText"></p>
-    <div class="progress"><span id="dashProgress"></span></div>
-   </div>
-   <div class="card">
-    <div class="card-head"><h3>Daily focus</h3></div>
-    <p class="muted">What's your most important priority today?</p>
-    <input id="focus" placeholder="My main focus...">
-    <button class="btn primary" style="margin-top:10px;width:100%" onclick="saveFocus()">Save focus</button>
-    <p class="muted" id="focusStatus"></p>
-   </div>
-  </div>
-  <div class="card">
-   <div class="card-head"><h3>Today's routine</h3><button class="btn" onclick="go('routines')">Manage →</button></div>
-   <div id="dashRoutine"></div>
-  </div>
- </section>
+<section class="page" id="tasks">
+ <div class="card">
+  <div class="card-head"><h3>My Tasks</h3><span class="tag" id="taskCount">0 tasks</span></div>
+  <form class="add-form" onsubmit="addTask(event)"><input id="taskInput" placeholder="Write a new task..." required><button class="btn">+ Add task</button></form>
+  <div id="taskList"></div>
+ </div>
+</section>
 
- <section class="page" id="tasks">
-  <h2 class="section-title">My Tasks</h2><p class="section-sub">Organise your day, one task at a time.</p>
-  <div class="card">
-   <div class="card-head"><h3>Task manager</h3><span class="muted" id="taskCount">0 tasks</span></div>
-   <div id="allTasks" class="task-list"></div>
-   <div class="add-form">
-    <input id="taskName" placeholder="What do you need to do?">
-    <select id="category"><option>Personal</option><option>Study</option><option>College</option><option>Health</option><option>Work</option></select>
-    <input id="taskTime" type="time">
-    <button class="btn primary" id="taskButton" onclick="addTask()">+ Add task</button>
-   </div>
-  </div>
- </section>
+<section class="page" id="routines">
+ <p class="section-note">Create routines that make your day easier.</p>
+ <div class="card">
+  <div class="card-head"><h3>My Routines</h3><button class="btn" onclick="newRoutine()">+ Create routine</button></div>
+  <div id="routineList"></div>
+ </div>
+ <div class="card">
+  <div class="card-head"><h3>Starter preset</h3><span class="tag">Suggested</span></div>
+  <p class="muted">A simple daily routine you can customize.</p>
+  <button class="btn light" onclick="addPreset()">+ Add daily starter routine</button>
+ </div>
+</section>
 
- <section class="page" id="routines">
-  <h2 class="section-title">My Routines</h2>
-  <p class="section-sub">Create your own daily schedule and make it yours.</p>
-  <div class="card">
-   <div class="card-head"><h3>Your routines</h3><button class="btn" onclick="loadRoutinePreset()">＋ College preset</button></div>
-   <div id="routineList" class="routine-list"></div>
-   <button class="btn primary" style="width:100%;margin-top:14px" onclick="openRoutineForm()">＋ Create new routine</button>
-  </div>
-  <div class="card" id="routineEditor" style="display:none">
-   <div class="card-head"><h3 id="routineFormTitle">Create a routine</h3><button class="btn" onclick="closeRoutineForm()">Close ×</button></div>
-   <div class="form-grid">
-    <input class="full" id="routineName" placeholder="Routine name (e.g. College Day)">
-    <div class="full">
-     <div class="small-title">Add activities</div>
-     <div class="form-grid">
-      <input id="activityName" placeholder="Activity name">
-      <input id="activityTime" type="time">
-      <button class="btn primary full" onclick="addActivity()">＋ Add activity</button>
-     </div>
-    </div>
-    <div class="full">
-     <div class="small-title">Activities in this routine</div>
-     <div id="editorActivities"></div>
-    </div>
-    <button class="btn primary full" onclick="saveRoutine()">Save routine</button>
-   </div>
-  </div>
- </section>
+<section class="page" id="habits">
+ <div class="card">
+  <div class="card-head"><h3>Habit Tracker</h3><span class="tag">Daily</span></div>
+  <form class="add-form" onsubmit="addHabit(event)"><input id="habitInput" placeholder="Add a habit..." required><button class="btn">+ Add habit</button></form>
+  <div id="habitList"></div>
+ </div>
+</section>
 
- <section class="page" id="habits">
-  <h2 class="section-title">My Habits</h2><p class="section-sub">Build small habits that support your goals.</p>
-  <div class="card">
-   <div class="card-head"><h3>Daily habits</h3></div>
-   <div id="habitsList" class="habit-list"></div>
-   <div class="goal-row"><input id="habitInput" placeholder="Add a new habit..."><button class="btn primary" onclick="addHabit()">Add</button></div>
-  </div>
- </section>
+<section class="page" id="goals">
+ <div class="card">
+  <div class="card-head"><h3>My Goals</h3><span class="tag">Keep growing</span></div>
+  <form class="add-form" onsubmit="addGoal(event)"><input id="goalInput" placeholder="What do you want to achieve?" required><button class="btn">+ Add goal</button></form>
+  <div id="goalList"></div>
+ </div>
+</section>
 
- <section class="page" id="goals">
-  <h2 class="section-title">My Goals</h2><p class="section-sub">Keep your long-term goals visible.</p>
-  <div class="card">
-   <div class="card-head"><h3>Goals list</h3></div>
-   <div id="goalsList" class="goal-list"></div>
-   <div class="goal-row"><input id="goalInput" placeholder="Write a goal..."><button class="btn primary" onclick="addGoal()">Add goal</button></div>
-  </div>
- </section>
+<section class="page" id="calendar">
+ <div class="card">
+  <div class="card-head"><button class="btn light" onclick="changeMonth(-1)">←</button><h3 id="monthTitle"></h3><button class="btn light" onclick="changeMonth(1)">→</button></div>
+  <div class="calendar-grid" id="calendarGrid"></div>
+ </div>
+</section>
 
- <section class="page" id="calendar">
-  <h2 class="section-title">Calendar</h2><p class="section-sub">Your current month at a glance.</p>
-  <div class="card">
-   <div class="card-head"><button class="btn" onclick="monthMove(-1)">←</button><h3 id="monthTitle"></h3><button class="btn" onclick="monthMove(1)">→</button></div>
-   <div class="calendar-grid" id="calendarGrid"></div>
+<section class="page" id="settings">
+ <div class="card">
+  <div class="card-head"><h3>Personal settings</h3></div>
+  <div class="setting-row"><div><strong>Profile name</strong><small>How should LifeZen greet you?</small></div><input id="nameInput" style="max-width:170px" placeholder="Your name" onchange="saveName()"></div>
+  <div class="setting-row"><div><strong>Language</strong><small>Choose your app language</small></div><select id="languageSelect" onchange="setLanguage(this.value)"><option value="en">English</option><option value="hi">हिन्दी</option></select></div>
+  <div class="setting-row"><div><strong>Appearance</strong><small>Light or dark theme</small></div><select id="themeSelect" onchange="setTheme(this.value)"><option value="light">Light</option><option value="dark">Dark</option></select></div>
+ </div>
+ <div class="card">
+  <div class="card-head"><h3>Your data</h3></div>
+  <p class="muted">Your data is stored in this browser on this device. Export a backup before changing devices.</p>
+  <div style="display:flex;gap:9px;flex-wrap:wrap">
+   <button class="btn" onclick="backup()">↓ Export backup</button>
+   <button class="btn light" onclick="document.getElementById('restoreFile').click()">↑ Restore backup</button>
+   <input type="file" id="restoreFile" accept="application/json" hidden onchange="restore(event)">
   </div>
- </section>
-
- <section class="page" id="settings">
-  <h2 class="section-title">Settings</h2><p class="section-sub">Make LifeZen work the way you like.</p>
-  <div class="card">
-   <div class="setting"><div><b>Profile name</b><p class="muted">Name displayed in your workspace</p></div><input id="profileName" placeholder="Your name" style="max-width:150px"></div>
-   <div class="setting"><div><b>Appearance</b><p class="muted">Light or dark mode</p></div><button class="btn" onclick="toggleTheme()">Change theme</button></div>
-   <div class="setting"><div><b>Language</b><p class="muted">Choose your preferred language</p></div><select id="language" onchange="setLanguage(this.value)" style="max-width:130px"><option value="en">English</option><option value="hi">हिंदी</option></select></div>
-   <div class="setting"><div><b>Backup your data</b><p class="muted">Download tasks, routines, habits and goals</p></div><button class="btn" onclick="backup()">Download</button></div>
-   <div class="setting"><div><b>Restore backup</b><p class="muted">Import a previous backup</p></div><input type="file" accept=".json" onchange="restore(event)" style="max-width:150px"></div>
-   <div class="setting"><div><b>Reset workspace</b><p class="muted">Clear all locally stored app data</p></div><button class="btn danger" onclick="resetApp()">Reset</button></div>
-   <p class="muted">LifeZen v5.1 • Your data stays in this browser.</p>
-  </div>
- </section>
+  <button class="btn danger" style="margin-top:15px" onclick="resetApp()">Reset all app data</button>
+ </div>
+ <div class="card"><h3>About LifeZen</h3><p class="muted">LifeZen helps you organize your day, build habits and make progress towards your goals.</p><p class="muted">Version 1.0 · Made with ✦</p></div>
+</section>
 </main>
 </div>
 
-<nav class="mobile-nav">
- <button class="active" data-page="dashboard"><span>◫</span>Home</button>
+<nav class="mobile-nav" id="mobileNav">
+ <button class="active" data-page="dashboard"><span>⌂</span>Home</button>
  <button data-page="tasks"><span>✓</span>Tasks</button>
  <button data-page="routines"><span>◷</span>Routines</button>
- <button data-page="habits"><span>◉</span>Habits</button>
+ <button data-page="habits"><span>◎</span>Habits</button>
  <button data-page="settings"><span>⚙</span>Settings</button>
 </nav>
+<div class="toast" id="toast"></div>
 
 <script>
-const KEY="lifezen_v5_data";
-const oldKey="lifezen_v4_data";
-let state;
-try{
- state=JSON.parse(localStorage.getItem(KEY)||"null");
- if(!state){
-  const old=JSON.parse(localStorage.getItem(oldKey)||"null");
-  state=old||{};
+const KEY="lifezen_complete_v1";
+const today=()=>new Date().toISOString().slice(0,10);
+let data={tasks:[],habits:[],goals:[],routines:[],focus:"",name:"",theme:"light",language:"en",lastDate:today()};
+let calDate=new Date();
+
+function load(){
+ try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved)data={...data,...saved}}catch(e){}
+ if(data.lastDate!==today()){
+  data.habits.forEach(x=>x.done=false);
+  data.lastDate=today();
  }
-}catch(e){state={}}
-state={
- tasks:Array.isArray(state.tasks)?state.tasks:[],
- habits:Array.isArray(state.habits)?state.habits:[],
- goals:Array.isArray(state.goals)?state.goals:[],
- routines:Array.isArray(state.routines)?state.routines:[],
- focus:state.focus||"",name:state.name||"",
- language:state.language||"en",
- lastDay:state.lastDay||new Date().toDateString()
-};
-let editingTask=-1,editingRoutine=-1,editorActivities=[];
-let month=new Date().getMonth(),year=new Date().getFullYear();
-const $=id=>document.getElementById(id);
-
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-
-function dailyCheck(){
- const today=new Date().toDateString();
- if(state.lastDay!==today){
-  state.tasks.forEach(t=>t.done=false);
-  state.habits.forEach(h=>h.done=false);
-  state.routines.forEach(r=>{
-   (r.activities||[]).forEach(a=>a.done=false);
-  });
-  state.lastDay=today;
-  save();
- }
+ document.body.classList.toggle("dark",data.theme==="dark");
+ document.getElementById("focusInput").value=data.focus||"";
+ document.getElementById("nameInput").value=data.name||"";
+ document.getElementById("languageSelect").value=data.language;
+ document.getElementById("themeSelect").value=data.theme;
+ renderAll();
 }
-
-function go(page){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- $(page).classList.add("active");
- document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
- const names={dashboard:"Dashboard",tasks:"My Tasks",routines:"My Routines",habits:"Habits",goals:"My Goals",calendar:"Calendar",settings:"Settings"};
- $("pageTitle").textContent=names[page]||"LifeZen";
- if(page==="calendar")drawCalendar();
- if(page==="routines")renderRoutines();
+function save(){data.lastDate=today();localStorage.setItem(KEY,JSON.stringify(data));}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display="none",2200)}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+ const names={dashboard:"Dashboard",tasks:"My Tasks",routines:"My Routines",habits:"Habit Tracker",goals:"My Goals",calendar:"Calendar",settings:"Settings"};
+ document.getElementById("pageTitle").textContent=names[id]||"LifeZen";
+ window.scrollTo(0,0);
 }
-document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page));
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 
-function makeTask(t,i){
- const row=document.createElement("div");
- row.className="task"+(t.done?" done":"");
- const check=document.createElement("input");
- check.type="checkbox";check.checked=!!t.done;
- check.onchange=()=>{state.tasks[i].done=check.checked;save();render()};
- const info=document.createElement("div");info.className="task-info";
- const name=document.createElement("div");name.className="task-name";name.textContent=t.name;
- const meta=document.createElement("div");meta.className="task-meta";meta.textContent=(t.category||"Personal")+(t.time?" • "+t.time:"");
- info.append(name,meta);
- const edit=document.createElement("button");edit.className="edit";edit.textContent="✎";edit.onclick=()=>editTask(i);
- const del=document.createElement("button");del.className="del";del.textContent="×";
- del.onclick=()=>{if(confirm("Delete task?")){state.tasks.splice(i,1);save();render()}};
- row.append(check,info,edit,del);
- return row;
+function addTask(e){e.preventDefault();const input=document.getElementById("taskInput");data.tasks.push({id:Date.now(),name:input.value.trim(),done:false});input.value="";save();renderAll();toast("Task added")}
+function toggleTask(id){const x=data.tasks.find(x=>x.id===id);if(x)x.done=!x.done;save();renderAll()}
+function deleteItem(type,id){data[type]=data[type].filter(x=>x.id!==id);save();renderAll();toast("Removed")}
+function addHabit(e){e.preventDefault();const input=document.getElementById("habitInput");data.habits.push({id:Date.now(),name:input.value.trim(),done:false});input.value="";save();renderAll();toast("Habit added")}
+function toggleHabit(id){const x=data.habits.find(x=>x.id===id);if(x)x.done=!x.done;save();renderAll()}
+function addGoal(e){e.preventDefault();const input=document.getElementById("goalInput");data.goals.push({id:Date.now(),name:input.value.trim(),done:false});input.value="";save();renderAll();toast("Goal added")}
+function toggleGoal(id){const x=data.goals.find(x=>x.id===id);if(x)x.done=!x.done;save();renderAll()}
+
+function itemHTML(x,type){
+ const fn=type==="tasks"?"toggleTask":type==="habits"?"toggleHabit":"toggleGoal";
+ return `<div class="item ${x.done?"done":""}"><input type="checkbox" ${x.done?"checked":""} onchange="${fn}(${x.id})"><span class="item-name">${escapeHTML(x.name)}</span><button class="delete" onclick="deleteItem('${type}',${x.id})">×</button></div>`;
 }
-
-function renderTasks(){
- $("allTasks").innerHTML="";$("dashTasks").innerHTML="";
- state.tasks.forEach((t,i)=>{
-  $("allTasks").append(makeTask(t,i));
-  if(i<5)$("dashTasks").append(makeTask(t,i));
- });
- if(!state.tasks.length){
-  $("allTasks").innerHTML='<div class="empty">No tasks yet. Add your first task above.</div>';
-  $("dashTasks").innerHTML='<div class="empty">Your daily plan starts here.</div>';
- }
- $("taskCount").textContent=state.tasks.length+" tasks";
- $("taskButton").textContent=editingTask<0?"+ Add task":"Save changes";
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderAll(){
+ document.getElementById("taskList").innerHTML=data.tasks.length?data.tasks.map(x=>itemHTML(x,"tasks")).join(""):'<div class="empty">No tasks yet. Add your first task!</div>';
+ document.getElementById("habitList").innerHTML=data.habits.length?data.habits.map(x=>itemHTML(x,"habits")).join(""):'<div class="empty">Start with one small habit.</div>';
+ document.getElementById("goalList").innerHTML=data.goals.length?data.goals.map(x=>itemHTML(x,"goals")).join(""):'<div class="empty">Your goals will appear here.</div>';
+ document.getElementById("dashTasks").innerHTML=data.tasks.length?data.tasks.slice(0,5).map(x=>itemHTML(x,"tasks")).join(""):'<div class="empty">Your task list is clear. Add something you want to do.</div>';
+ document.getElementById("dashHabits").innerHTML=data.habits.length?data.habits.slice(0,5).map(x=>itemHTML(x,"habits")).join(""):'<div class="empty">Add a habit to start tracking.</div>';
+ document.getElementById("taskCount").textContent=data.tasks.length+" tasks";
+ const td=data.tasks.filter(x=>x.done).length,hd=data.habits.filter(x=>x.done).length;
+ document.getElementById("taskStat").textContent=td+"/"+data.tasks.length;
+ document.getElementById("habitStat").textContent=hd+"/"+data.habits.length;
+ document.getElementById("goalStat").textContent=data.goals.filter(x=>!x.done).length;
+ const total=data.tasks.length+data.habits.length,done=td+hd;
+ document.getElementById("progressStat").textContent=(total?Math.round(done/total*100):0)+"%";
+ document.getElementById("sideName").textContent=data.name||"My Profile";
+ document.getElementById("avatar").textContent=(data.name||"B").charAt(0).toUpperCase();
+ document.getElementById("greeting").textContent=(data.name?"Welcome back, "+data.name+"!":"Welcome back!")+" 👋";
+ renderRoutines();renderCalendar();
 }
+function saveFocus(){data.focus=document.getElementById("focusInput").value;save();toast("Daily focus saved")}
+function saveName(){data.name=document.getElementById("nameInput").value.trim();save();renderAll();toast("Profile updated")}
+function toggleTheme(){setTheme(data.theme==="dark"?"light":"dark")}
+function setTheme(v){data.theme=v;document.body.classList.toggle("dark",v==="dark");save();document.getElementById("themeSelect").value=v}
+function setLanguage(v){data.language=v;save();toast(v==="hi"?"भाषा सेटिंग सेव हो गई":"Language preference saved")}
 
-function addTask(){
- const name=$("taskName").value.trim();
- if(!name)return alert("Write a task first.");
- const t={name,category:$("category").value,time:$("taskTime").value,done:false};
- if(editingTask>=0){state.tasks[editingTask]=t;editingTask=-1}
- else state.tasks.push(t);
- $("taskName").value="";$("taskTime").value="";
- save();render();
+function newRoutine(){
+ const name=prompt("Enter routine name:");
+ if(!name||!name.trim())return;
+ const activity=prompt("Add your first activity (optional):");
+ data.routines.push({id:Date.now(),name:name.trim(),activities:activity?[activity.trim()]:[]});
+ save();renderAll();toast("Routine created");
 }
-
-function editTask(i){
- editingTask=i;const t=state.tasks[i];
- $("taskName").value=t.name;$("category").value=t.category||"Personal";
- $("taskTime").value=t.time||"";
- $("taskButton").textContent="Save changes";go("tasks");$("taskName").focus();
+function addPreset(){
+ if(data.routines.some(r=>r.name==="Daily Starter")){toast("Starter routine already exists");return}
+ data.routines.push({id:Date.now(),name:"Daily Starter",activities:["Wake up and freshen up","Exercise or stretch","Breakfast","Study or focused work","Evening review"]});
+ save();renderAll();toast("Starter routine added");
 }
-
-function addHabit(){
- const v=$("habitInput").value.trim();if(!v)return;
- state.habits.push({name:v,done:false});$("habitInput").value="";save();render();
+function addActivity(id){
+ const r=data.routines.find(x=>x.id===id);if(!r)return;
+ const a=prompt("Enter activity:");if(!a||!a.trim())return;
+ r.activities.push(a.trim());save();renderAll();
 }
-
-function renderHabits(){
- $("habitsList").innerHTML="";
- state.habits.forEach((h,i)=>{
-  const row=document.createElement("div");row.className="habit";
-  const c=document.createElement("input");c.type="checkbox";c.checked=!!h.done;
-  c.onchange=()=>{state.habits[i].done=c.checked;save();render()};
-  const s=document.createElement("span");s.textContent=h.name;
-  const d=document.createElement("button");d.className="del";d.textContent="×";
-  d.onclick=()=>{state.habits.splice(i,1);save();render()};
-  row.append(c,s,d);$("habitsList").append(row);
- });
- if(!state.habits.length)$("habitsList").innerHTML='<div class="empty">Add habits you want to build.</div>';
-}
-
-function addGoal(){
- const v=$("goalInput").value.trim();if(!v)return;
- state.goals.push({name:v,done:false});$("goalInput").value="";save();render();
-}
-
-function renderGoals(){
- $("goalsList").innerHTML="";
- state.goals.forEach((g,i)=>{
-  const row=document.createElement("div");row.className="goal";
-  const c=document.createElement("input");c.type="checkbox";c.checked=!!g.done;
-  c.onchange=()=>{state.goals[i].done=c.checked;save();render()};
-  const s=document.createElement("span");s.textContent=g.name;
-  if(g.done)s.style.textDecoration="line-through";
-  const d=document.createElement("button");d.className="del";d.textContent="×";
-  d.onclick=()=>{state.goals.splice(i,1);save();render()};
-  row.append(c,s,d);$("goalsList").append(row);
- });
- if(!state.goals.length)$("goalsList").innerHTML='<div class="empty">Your goals will appear here.</div>';
-}
-
-function renderStats(){
- const total=state.tasks.length,done=state.tasks.filter(t=>t.done).length;
- const p=total?Math.round(done/total*100):0;
- $("total").textContent=total;$("completed").textContent=done;
- $("habitCount").textContent=state.habits.length;$("goalCount").textContent=state.goals.length;
- $("dashProgress").style.width=p+"%";
- $("dashProgressText").textContent=p+"% of your tasks completed";
-}
-
-function render(){
- renderTasks();renderHabits();renderGoals();renderStats();
- renderRoutines();renderDashboardRoutine();
-}
-
-function saveFocus(){
- state.focus=$("focus").value;save();
- $("focusStatus").textContent="Focus saved ✓";
-}
-
-function toggleTheme(){
- document.body.classList.toggle("dark");
- localStorage.setItem("lifezen_theme",document.body.classList.contains("dark")?"dark":"light");
-}
-
-function setLanguage(v){state.language=v;save();applyLanguage()}
-
-function applyLanguage(){
- $("language").value=state.language||"en";
- if(state.language==="hi"){
-  $("pageTitle").textContent="डैशबोर्ड";
-  $("welcomeTitle").textContent="वापसी पर स्वागत है! ✨";
-  $("dateText").textContent="आपकी व्यक्तिगत उत्पादकता जगह";
- }else{
-  $("pageTitle").textContent="Dashboard";
-  $("welcomeTitle").textContent="Welcome back"+(state.name?", "+state.name:"")+"! ✨";
- }
-}
-
-function backup(){
- const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
- const url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download="lifezen-backup.json";a.click();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-
-function restore(e){
- const f=e.target.files[0];if(!f)return;
- const r=new FileReader();
- r.onload=()=>{
-  try{
-   const d=JSON.parse(r.result);
-   if(!Array.isArray(d.tasks)||!Array.isArray(d.goals)||!Array.isArray(d.habits))throw Error();
-   state={...state,...d,routines:Array.isArray(d.routines)?d.routines:[]};
-   save();render();applyLanguage();alert("Backup restored!");
-  }catch(err){alert("Invalid backup file")}
-  e.target.value="";
- };
- r.readAsText(f);
-}
-
-function resetApp(){
- if(confirm("This will delete your local LifeZen data. Continue?")){
-  localStorage.removeItem(KEY);localStorage.removeItem(oldKey);location.reload();
- }
-}
-
-/* ROUTINE BUILDER */
-
-function openRoutineForm(index=-1){
- editingRoutine=index;
- editorActivities=index>=0?JSON.parse(JSON.stringify(state.routines[index].activities||[])):[];
- $("routineName").value=index>=0?state.routines[index].name:"";
- $("routineFormTitle").textContent=index>=0?"Edit routine":"Create a routine";
- $("routineEditor").style.display="block";
- renderEditorActivities();
- $("routineName").focus();
-}
-
-function closeRoutineForm(){
- $("routineEditor").style.display="none";
- editingRoutine=-1;editorActivities=[];
-}
-
-function addActivity(){
- const name=$("activityName").value.trim(),time=$("activityTime").value;
- if(!name)return alert("Enter an activity name.");
- editorActivities.push({name,time,done:false});
- $("activityName").value="";$("activityTime").value="";
- renderEditorActivities();
-}
-
-function renderEditorActivities(){
- const box=$("editorActivities");box.innerHTML="";
- if(!editorActivities.length){
-  box.innerHTML='<div class="empty">No activities added yet.</div>';return;
- }
- editorActivities.forEach((a,i)=>{
-  const row=document.createElement("div");row.className="routine-activity";
-  const time=document.createElement("span");time.className="routine-time";time.textContent=a.time||"Any time";
-  const name=document.createElement("span");name.className="activity-name";name.textContent=a.name;
-  const del=document.createElement("button");del.className="del";del.textContent="×";
-  del.onclick=()=>{editorActivities.splice(i,1);renderEditorActivities()};
-  row.append(time,name,del);box.append(row);
- });
-}
-
-function saveRoutine(){
- const name=$("routineName").value.trim();
- if(!name)return alert("Please enter a routine name.");
- if(!editorActivities.length)return alert("Add at least one activity.");
- editorActivities.sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"));
- const routine={name,activities:editorActivities};
- if(editingRoutine>=0){
-  state.routines[editingRoutine]=routine;
- }else{
-  state.routines.push(routine);
- }
- save();closeRoutineForm();render();
- alert("Routine saved successfully!");
-}
-
-/* ROUTINE CHECKBOXES */
-
-function makeRoutineActivity(activity,onChange){
- const row=document.createElement("div");
- row.className="routine-activity"+(activity.done?" completed":"");
-
- const check=document.createElement("input");
- check.type="checkbox";
- check.checked=!!activity.done;
- check.setAttribute("aria-label","Mark "+activity.name+" as complete");
-
- check.onchange=()=>{
-  onChange(check.checked);
- };
-
- const time=document.createElement("span");
- time.className="routine-time";
- time.textContent=activity.time||"Any time";
-
- const name=document.createElement("span");
- name.className="activity-name";
- name.textContent=activity.name;
-
- row.append(check,time,name);
- return row;
-}
-
 function renderRoutines(){
- const box=$("routineList");
- if(!box)return;
- box.innerHTML="";
-
- if(!state.routines.length){
-  box.innerHTML='<div class="empty">No routines yet. Create your first routine or add the College preset.</div>';
-  return;
- }
-
- state.routines.forEach((r,i)=>{
-  const card=document.createElement("div");
-  card.className="routine-card";
-
-  const top=document.createElement("div");
-  top.className="routine-top";
-
-  const title=document.createElement("strong");
-  title.textContent=r.name;
-
-  const actions=document.createElement("div");
-  actions.className="routine-actions";
-
-  const edit=document.createElement("button");
-  edit.className="btn";
-  edit.textContent="Edit";
-  edit.onclick=()=>openRoutineForm(i);
-
-  const del=document.createElement("button");
-  del.className="btn danger";
-  del.textContent="Delete";
-  del.onclick=()=>{
-   if(confirm("Delete this routine?")){
-    state.routines.splice(i,1);
-    save();render();
-   }
-  };
-
-  actions.append(edit,del);
-  top.append(title,actions);
-  card.append(top);
-
-  const activities=r.activities||[];
-  const done=activities.filter(a=>a.done).length;
-
-  activities.forEach((a,j)=>{
-   card.append(makeRoutineActivity(a,checked=>{
-    state.routines[i].activities[j].done=checked;
-    save();render();
-   }));
-  });
-
-  const progress=document.createElement("div");
-  progress.className="routine-progress";
-  progress.textContent=done+" of "+activities.length+" activities completed";
-  card.append(progress);
-
-  box.append(card);
- });
+ const el=document.getElementById("routineList");
+ el.innerHTML=data.routines.length?data.routines.map(r=>`<div class="routine-row"><div><strong>${escapeHTML(r.name)}</strong><small>${r.activities.length} activities</small><small>${r.activities.map(escapeHTML).join(" · ")}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn light" onclick="addActivity(${r.id})">+ Activity</button><button class="delete" onclick="deleteItem('routines',${r.id})">×</button></div></div>`).join(""):'<div class="empty">No routines yet. Create your first routine.</div>';
 }
-
-function renderDashboardRoutine(){
- const box=$("dashRoutine");
- if(!box)return;
- box.innerHTML="";
-
- if(!state.routines.length){
-  box.innerHTML='<div class="empty">Create a routine to see it here.</div>';
-  return;
- }
-
- const r=state.routines[0];
- const activities=r.activities||[];
-
- const title=document.createElement("b");
- title.textContent=r.name;
- box.append(title);
-
- const done=activities.filter(a=>a.done).length;
-
- activities.forEach((a,i)=>{
-  box.append(makeRoutineActivity(a,checked=>{
-   state.routines[0].activities[i].done=checked;
-   save();render();
-  }));
- });
-
- const progress=document.createElement("div");
- progress.className="routine-progress";
- progress.textContent=done+" of "+activities.length+" activities completed";
- box.append(progress);
+function renderCalendar(){
+ const y=calDate.getFullYear(),m=calDate.getMonth();
+ document.getElementById("monthTitle").textContent=calDate.toLocaleDateString(data.language==="hi"?"hi-IN":"en-US",{month:"long",year:"numeric"});
+ const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+ const labels=data.language==="hi"?["रवि","सोम","मंगल","बुध","गुरु","शुक्र","शनि"]:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+ let html=labels.map(d=>`<div class="day">${d}</div>`).join("");
+ for(let i=0;i<first;i++)html+="<div></div>";
+ for(let d=1;d<=days;d++){const isToday=d===new Date().getDate()&&m===new Date().getMonth()&&y===new Date().getFullYear();html+=`<div class="${isToday?"today":""}">${d}</div>`}
+ document.getElementById("calendarGrid").innerHTML=html;
 }
-
-function loadRoutinePreset(){
- const exists=state.routines.some(r=>r.name==="College Day");
- if(exists)return alert("College Day preset is already in your routines.");
-
- state.routines.push({
-  name:"College Day",
-  activities:[
-   {time:"07:00",name:"Wake up and freshen up",done:false},
-   {time:"07:30",name:"Exercise and breakfast",done:false},
-   {time:"08:00",name:"Get ready for college",done:false},
-   {time:"09:00",name:"Leave for college",done:false},
-   {time:"15:00",name:"College ends",done:false},
-   {time:"16:00",name:"Rest and personal time",done:false},
-   {time:"17:00",name:"BA study session",done:false},
-   {time:"18:30",name:"English practice",done:false},
-   {time:"20:00",name:"Dinner and family time",done:false},
-   {time:"21:00",name:"BCA study session",done:false},
-   {time:"22:00",name:"Plan tomorrow and relax",done:false}
-  ]
- });
-
- save();render();
- alert("College Day preset added! You can now tick each activity.");
+function changeMonth(n){calDate.setMonth(calDate.getMonth()+n);renderCalendar()}
+function backup(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="lifezen-backup.json";a.click();URL.revokeObjectURL(a.href);toast("Backup exported");
 }
-
-/* CALENDAR */
-
-function drawCalendar(){
- $("monthTitle").textContent=new Date(year,month,1).toLocaleDateString("en",{month:"long",year:"numeric"});
- const first=new Date(year,month,1).getDay(),days=new Date(year,month+1,0).getDate();
- const grid=$("calendarGrid");grid.innerHTML="";
- ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(x=>{
-  const el=document.createElement("div");el.className="day";el.textContent=x;grid.append(el);
- });
- for(let i=0;i<first;i++)grid.append(document.createElement("div"));
- for(let d=1;d<=days;d++){
-  const el=document.createElement("div");el.className="day";
-  if(d===new Date().getDate()&&month===new Date().getMonth()&&year===new Date().getFullYear())el.classList.add("today");
-  el.textContent=d;grid.append(el);
- }
+function restore(e){
+ const file=e.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{try{const imported=JSON.parse(reader.result);if(!imported||!Array.isArray(imported.tasks)||!Array.isArray(imported.habits))throw Error();data={...data,...imported};save();load();toast("Backup restored")}catch(err){toast("Invalid backup file")}};
+ reader.readAsText(file);e.target.value="";
 }
-
-function monthMove(n){
- month+=n;
- if(month<0){month=11;year--}
- if(month>11){month=0;year++}
- drawCalendar();
+function resetApp(){
+ if(!confirm("This will permanently clear LifeZen data in this browser. Continue?"))return;
+ localStorage.removeItem(KEY);data={tasks:[],habits:[],goals:[],routines:[],focus:"",name:"",theme:"light",language:"en",lastDate:today()};load();toast("App data reset");
 }
-
-/* PROFILE AND STARTUP */
-
-const now=new Date();
-$("dateText").textContent=now.toLocaleDateString("en",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-if(localStorage.getItem("lifezen_theme")==="dark")document.body.classList.add("dark");
-$("focus").value=state.focus||"";
-$("profileName").value=state.name||"";
-
-function updateProfile(){
- state.name=$("profileName").value.trim();
- $("avatar").textContent=(state.name[0]||"L").toUpperCase();
- $("welcomeTitle").textContent="Welcome back"+(state.name?", "+state.name:"")+"! ✨";
- save();
-}
-
-$("profileName").onchange=updateProfile;
-$("avatar").textContent=(state.name||"L")[0].toUpperCase();
-
-dailyCheck();
-render();
-applyLanguage();
-drawCalendar();
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("./sw.js")
-      .then(() => console.log("LifeZen offline support ready!"))
-      .catch((error) =>
-        console.error("Service Worker error:", error)
-      );
-  });
-}
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("./sw.js")
-      .then(() => console.log("LifeZen offline support ready!"))
-      .catch((error) =>
-        console.error("Service Worker error:", error)
-      );
-  });
-}
+document.getElementById("dateText").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+load();
 </script>
 </body>
 </html>
